@@ -8,7 +8,34 @@ Created on Sun Jan 16 15:08:22 2022
 
 import numpy as np
 from scipy.stats import unitary_group
+from scipy.linalg import hadamard
 
+omega = np.exp(1j*2*np.pi/4)
+X = np.asarray([[0, 1], [1, 0]], dtype=complex)
+Z = np.asarray([[1, 0], [0, -1]], dtype=complex)
+
+mat = np.zeros((5,4,4), dtype=complex)
+
+mat[0] = np.eye(4, dtype=complex)
+mat[1] = hadamard(4, dtype=complex)/2
+mat[2] = (np.kron(Z, 1j*np.ones((2,2), dtype=complex))) + np.kron(X, [[-1, 1], [1, -1]])/2
+
+mat[3] = np.asarray([[1, 1j, 1, -1j], [1j, -1, -1j, -1], [1j, 1, 1j, -1], [-1, 1j, 1, 1j]])/2
+mat[4] = np.asarray([[1j, -1, 1j, -1], [-1, -1j, 1, 1j], [1j, 1, 1j, 1], [1, -1j, -1, 1j]])/2
+
+for i in range(5):
+    for j in range(5):
+        for l in range(4):
+            for k in range(4):
+                if i != j:
+                    print('i,j=', i, j)
+                    print(abs((mub4[i][:][l]@mub4[j][:][k].T)**2))
+        
+for i in range(5):
+    for j in range(5):
+        if i != j:
+            print('i,j=', i, j)
+            print(sum(sum(mub4[i]@mub4[j])))
 def mubs(o):
     # mubs in correlator form.
     # For prime o is okay, otherwise might not be correct.
@@ -31,8 +58,8 @@ def mubs(o):
     povm = np.zeros((o+1, o, o, o), dtype=complex)
     for ind_o in range(o+1):
         for ind_povm in range(o):
-            povm[ind_o, ind_povm] = np.tensordot(ZX_o[ind_o, :, ind_povm], ZX_o[ind_o, :, ind_povm].T, axes=0)
-    return povm
+            povm[ind_o, ind_povm] = np.tensordot(ZX_o[ind_o][:][ind_povm], ZX_o[ind_o][:][ind_povm].T, axes=0)
+    return povm, ZX_o
 
 def ProbDist_2mo(m, o):
     
