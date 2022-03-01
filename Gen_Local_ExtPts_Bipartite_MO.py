@@ -52,18 +52,21 @@ def Gen_Local_ExtPts_Bipartite_MO(m, o):
     Extpts = Extpts.reshape(num_ExtPts, -1)
     # N_marg: (num, A/B, x/y, a/b)
     N_marg = np.zeros((num_ExtPts, N*m*(o-1)))
+    # test_AB = np.zeros(Extpts.shape)
     for ind_extpts in range(num_ExtPts):
         # Combine Pax and Pby.
         combine = np.unravel_index(ind_extpts, [num_local_strategy]*N)
         # Pax
-        tmp_marg = marg_Exts[combine[0]].reshape(1, -1)
-        for ind_m in range(1, m):
-            # Pby
-            tmp_marg = np.concatenate((tmp_marg, marg_Exts[combine[ind_m]].reshape(1, -1)), axis=1).reshape(1,-1)
-            
+        tmp_marg_A = marg_Exts[combine[0]].reshape(1, -1)
+        tmp_marg_B = marg_Exts[combine[1]].reshape(1, -1)
+        tmp_marg = np.concatenate((tmp_marg_A, tmp_marg_B), axis=1).reshape(1,-1)    
         N_marg[ind_extpts] = tmp_marg
+        
+        # tmp_AB = np.tensordot(tmp_marg_A, tmp_marg_B, axes=0).reshape(1,-1)
+        # test_AB[ind_extpts] = tmp_AB
+    # test_ext = np.concatenate((N_marg, test_AB), axis=1)
     Extpts = np.concatenate((N_marg, Extpts), axis=1)
-    
+    # print(test_ext-Extpts)
     return Extpts
     # --------- another way to get Extpts. -----------
     # Extpts = np.zeros((num_ExtPts, dim_Extpts))
