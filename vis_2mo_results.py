@@ -16,16 +16,15 @@ from vis_2mo_linpro import vis_2mo
 from itertools import combinations
 
 def m_from_MUBs(m, num_povm):
-  com = combinations(np.arange(num_povm), m)
-  m_from_mubs = list(com)
-  A_combine_B = []
-  for ind in range(len(m_from_mubs)**2):
-    A_combine_B.append(np.unravel_index(ind, [len(m_from_mubs)]*2))
-  return m_from_mubs, A_combine_B
+      com = combinations(np.arange(num_povm), m)
+      m_from_mubs = list(com)
+      A_combine_B = []
+      for ind in range(len(m_from_mubs)**2):
+          A_combine_B.append(np.unravel_index(ind, [len(m_from_mubs)]*2))
+      return m_from_mubs, A_combine_B
 
 
-def vis_2mo_results(m, o):
-    num_pts = 5
+def vis_2mo_results(m, o, num_pts, seed):
     exts = Gen_Local_ExtPts_Bipartite_MO(m, o)
     num_pax = (o-1)*m
     num_pabxy = ((o-1)*m)**2
@@ -48,19 +47,20 @@ def vis_2mo_results(m, o):
     
     m_combine, ab_ind = m_from_MUBs(m, o+1)
     
-    solver = cp.GLPK_MI
+    solver = 0
+    # solver = cp.GLPK_MI
     # solver = 'ECOS_BB'
     vis = np.zeros(num_pts)
     vis_tmp = np.zeros(len(ab_ind))
-    np.random.seed(3)
+    np.random.seed(seed)
     for i in range(num_pts):
-      ua = unitary_group.rvs(o)
-      ub = unitary_group.rvs(o)
-      for ind, com in enumerate(ab_ind):
-        ma = mubs_povm[list(m_combine[com[0]])]
-        mb = mubs_povm[list(m_combine[com[1]])]
+        ua = unitary_group.rvs(o)
+        ub = unitary_group.rvs(o)
+        for ind, com in enumerate(ab_ind):
+            ma = mubs_povm[list(m_combine[com[0]])]
+            mb = mubs_povm[list(m_combine[com[1]])]
     
-        pt = ProbDist_2mo_v1(m, o, ma, mb, ua, ub)
-        vis_tmp[ind] = vis_2mo(pt, exts, m, o, pw, solver)
-      vis[i] = min(vis_tmp)
-      return vis
+            pt = ProbDist_2mo_v1(m, o, ma, mb, ua, ub)
+            vis_tmp[ind] = vis_2mo(pt, exts, m, o, pw, solver)
+        vis[i] = min(vis_tmp)
+    return vis
