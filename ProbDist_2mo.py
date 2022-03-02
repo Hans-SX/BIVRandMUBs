@@ -77,8 +77,7 @@ def ProbDist_2mo_v1(m, o, ma, mb, ua, ub):
                 for yi in range(m):
                     Mab = np.tensordot(Ma[xi, ai], Mb[yi, bi], axes=0)
                     # (|a>,<a|,|b>,<b| ) -> (|ab>,<ab|)
-                    # Mab = np.swapaxes(Mab, 1, 2).reshape(o**2, o**2)
-                    Mab = Mab.reshape(o**2, o**2)
+                    Mab = np.swapaxes(Mab, 1, 2).reshape(o**2, o**2)
                     rhoM = rho @ Mab
                     Pabxy[xi, ai, yi, bi] = np.trace(rhoM)
                     if ai == bi == xi == yi:
