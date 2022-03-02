@@ -32,7 +32,7 @@ def vis_2mo(pt, exts, m, o, pw, solver=0):
   constraints = constraints + [coeff >= 0]
   constraints = constraints + [cp.sum(coeff, axis=1) == 1]
   constraints = constraints + [coeff @ exts == P]
-  obj = cp.Minimize(v)
+  obj = cp.Maximize(v)
   prob = cp.Problem(obj, constraints)
 
   if solver == 0:
