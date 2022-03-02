@@ -65,10 +65,10 @@ def ProbDist_2mo_v1(m, o, ma, mb, ua, ub):
         
     Pax = np.zeros((m, o-1), dtype=complex)
     Pby = np.zeros((m, o-1), dtype=complex)
-    for ind_o in range(o-1):
-        for ind_m in range(m):
-            Pax[ind_m, ind_o] = np.trace(rho_a @ Ma[ind_m, ind_o])
-            Pby[ind_m, ind_o] = np.trace(rho_b @ Mb[ind_m, ind_o])
+    # for ind_o in range(o-1):
+    #     for ind_m in range(m):
+    #         Pax[ind_m, ind_o] = np.trace(rho_a @ Ma[ind_m, ind_o])
+    #         Pby[ind_m, ind_o] = np.trace(rho_b @ Mb[ind_m, ind_o])
             
     Pabxy = np.zeros((m, o-1, m, o-1), dtype=complex)
     for ai in range(o-1):
@@ -77,8 +77,13 @@ def ProbDist_2mo_v1(m, o, ma, mb, ua, ub):
                 for yi in range(m):
                     Mab = np.tensordot(Ma[xi, ai], Mb[yi, bi], axes=0)
                     # (|a>,<a|,|b>,<b| ) -> (|ab>,<ab|)
-                    Mab = np.swapaxes(Mab, 1, 2).reshape(o**2, o**2)
-                    Pabxy[xi, ai, yi, bi] = np.trace(rho @ Mab)
+                    # Mab = np.swapaxes(Mab, 1, 2).reshape(o**2, o**2)
+                    Mab = Mab.reshape(o**2, o**2)
+                    rhoM = rho @ Mab
+                    Pabxy[xi, ai, yi, bi] = np.trace(rhoM)
+                    if ai == bi == xi == yi:
+                        Pax[xi, ai] = np.trace(np.trace(rhoM.reshape(o,o,o,o), axis1=1, axis2=3))
+                        Pby[yi, bi] = np.trace(np.trace(rhoM.reshape(o,o,o,o), axis1=0, axis2=2))
     ProbDist = np.concatenate((Pax.reshape(1,-1), Pby.reshape(1, -1), Pabxy.reshape(1,-1)), axis=1).real
     return ProbDist
 
