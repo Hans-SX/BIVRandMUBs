@@ -62,8 +62,9 @@ def vis_2mo_results(m, o, num_pts, seed):
         for ind, com in enumerate(ab_ind):
             ma = mubs_povm[list(m_combine[com[0]])]
             mb = mubs_povm[list(m_combine[com[1]])]
-    
-            pt = ProbDist_2mo_v1(m, o, ma, mb, ua, ub)
+            
+            pt = ProbDist_2mo_vAlljoint(m, o, ma, mb, ua, ub)
+            # pt = ProbDist_2mo_v1(m, o, ma, mb, ua, ub)
             vis_tmp[ind] = vis_2mo(pt, exts, m, o, pw, solver)
         vis[i] = min(vis_tmp)
     return vis
