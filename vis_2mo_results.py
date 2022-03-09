@@ -27,9 +27,9 @@ def m_from_MUBs(m, num_povm):
 
 def vis_2mo_results(m, o, num_pts, seed):
     # exts = Gen_Local_ExtPts_Bipartite_MO(m, o)
-    exts = Gen_Local_ExtPts_Bipartite_MO_jointprob
+    exts = Gen_Local_ExtPts_Bipartite_MO_jointprob(m, o)
     # num_pax = (o-1)*m
-    num_pabxy = ((o-1)*m)**2
+    num_pabxy = (o*m)**2
     # probability distribution of white noise
     pw = np.ones(num_pabxy)/o**2
     # pw = np.concatenate((np.ones(2*num_pax)/o, np.ones(num_pabxy)/o**2)).reshape(1, -1)
@@ -64,6 +64,7 @@ def vis_2mo_results(m, o, num_pts, seed):
             mb = mubs_povm[list(m_combine[com[1]])]
             
             pt = ProbDist_2mo_vAlljoint(m, o, ma, mb, ua, ub)
+            pt = pt.reshape(1,-1)
             # pt = ProbDist_2mo_v1(m, o, ma, mb, ua, ub)
             vis_tmp[ind] = vis_2mo(pt, exts, m, o, pw, solver)
         vis[i] = min(vis_tmp)

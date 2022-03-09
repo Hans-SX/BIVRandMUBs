@@ -104,14 +104,10 @@ def ProbDist_2mo_vAlljoint(m, o, ma, mb, ua, ub):
         ket = np.zeros(o, dtype=complex)
         ket[d] = 1
         kets.append(ket)
-        # state += np.kron(kets[d], kets[d])
         state += np.tensordot(kets[d], kets[d], axes=0)
     state = state / np.sqrt(o)
-    # state = state.reshape(o**2, 1) / np.sqrt(o)
     rho = np.tensordot(state, state, axes=0)
-    # rho = np.kron(state, np.conj(state.T))
-    # rho_a = np.trace(rho.reshape(o,o,o,o), axis1=0, axis2=2)
-    # rho_b = np.trace(rho.reshape(o,o,o,o), axis1=1, axis2=3)
+
     
     # o-1 for using the constraint sum_a Pax = 1.
     # Pax (a -> ind_o, x -> ind_m), ind_o-th POVM element and ind_m-th measurement.
@@ -129,22 +125,17 @@ def ProbDist_2mo_vAlljoint(m, o, ma, mb, ua, ub):
             for xi in range(m):
                 for yi in range(m):
                     Mab = np.tensordot(Ma[xi, ai], Mb[yi, bi], axes=0)
-                    # (|a>,<a|,|b>,<b| ) -> (|ab>,<ab|)
-                    # Mab = np.swapaxes(Mab, 1, 2).reshape(o**2, o**2)
-                    # Mab = Mab.reshape(o**2, o**2)
-                    # np.tensordot -> np.swapaxes is the same as using np.kron
-                    # Mab = np.kron(Ma[xi, ai], Mb[yi, bi])
-                    # Mab = Mab.reshape(o**2, o**2)
                     rhoM = rho @ Mab
                     Pabxy[xi, ai, yi, bi] = np.trace(rhoM.reshape(o*m,o*m))
     return Pabxy
 
-from scipy.stats import unitary_group
-for i in range(10):
-    ua = unitary_group.rvs(2)
-    ub = unitary_group.rvs(2)
-    povm, mub2 = mubs(2)
-    # prob = ProbDist_2mo_v1(2,2,povm[:2],povm[:2],ua,ub)
-    prob = ProbDist_2mo_vAlljoint(2,2,povm[:2],povm[:2], ua, ub)
-    print(np.sum(prob.real, axis=1))
-    print(np.sum(prob.real, axis=3))
+if __name__ == '__main__':
+    from scipy.stats import unitary_group
+    for i in range(10):
+        ua = unitary_group.rvs(2)
+        ub = unitary_group.rvs(2)
+        povm, mub2 = mubs(2)
+        # prob = ProbDist_2mo_v1(2,2,povm[:2],povm[:2],ua,ub)
+        prob = ProbDist_2mo_vAlljoint(2,2,povm[:2],povm[:2], ua, ub)
+        print(np.sum(prob.real, axis=1))
+        print(np.sum(prob.real, axis=3))
