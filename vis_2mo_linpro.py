@@ -11,7 +11,8 @@ import cvxpy as cp
 def vis_2mo(pt, exts, m, o, pw, solver=0):
   '''
   pt: a point of probability distribution from entangled state, has the form:
-      ({Pax}, {Pby}, {Pabxy})_(a, b = 1 ~ o-1 ).
+      ({Pax}, {Pby}, {Pabxy})_(a, b = 1 ~ o-1 )
+      or {Pabxy}.
   exts: local extreme points, the form is the same as pt.
   m: number of measurements
   o: number of outcomes per measurement.
