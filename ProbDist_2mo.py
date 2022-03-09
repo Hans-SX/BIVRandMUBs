@@ -129,12 +129,13 @@ def ProbDist_2mo_vAlljoint(m, o, ma, mb, ua, ub):
                     Pabxy[xi, ai, yi, bi] = np.trace(rhoM.reshape(o*m,o*m))
     return Pabxy
 
-from scipy.stats import unitary_group
-for i in range(10):
-    ua = unitary_group.rvs(2)
-    ub = unitary_group.rvs(2)
-    povm, mub2 = mubs(2)
-    # prob = ProbDist_2mo_v1(2,2,povm[:2],povm[:2],ua,ub)
-    prob = ProbDist_2mo_vAlljoint(2,2,povm[:2],povm[:2], ua, ub)
-    print(np.sum(prob.real, axis=1))
-    print(np.sum(prob.real, axis=3))
+if __name__ == '__main__':
+    from scipy.stats import unitary_group
+    for i in range(10):
+        ua = unitary_group.rvs(2)
+        ub = unitary_group.rvs(2)
+        povm, mub2 = mubs(2)
+        # prob = ProbDist_2mo_v1(2,2,povm[:2],povm[:2],ua,ub)
+        prob = ProbDist_2mo_vAlljoint(2,2,povm[:2],povm[:2], ua, ub)
+        print(np.sum(prob.real, axis=1))
+        print(np.sum(prob.real, axis=3))
