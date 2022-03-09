@@ -11,7 +11,8 @@ from scipy.linalg import hadamard
 import cvxpy as cp
 
 from Gen_Local_ExtPts_Bipartite_MO import Gen_Local_ExtPts_Bipartite_MO
-from ProbDist_2mo import ProbDist_2mo_v1, mubs
+from Gen_Local_ExtPts_Bipartite_MO import Gen_Local_ExtPts_Bipartite_MO_jointprob
+from ProbDist_2mo import ProbDist_2mo_v1, ProbDist_2mo_vAlljoint, mubs
 from vis_2mo_linpro import vis_2mo
 from itertools import combinations
 
@@ -25,11 +26,13 @@ def m_from_MUBs(m, num_povm):
 
 
 def vis_2mo_results(m, o, num_pts, seed):
-    exts = Gen_Local_ExtPts_Bipartite_MO(m, o)
-    num_pax = (o-1)*m
+    # exts = Gen_Local_ExtPts_Bipartite_MO(m, o)
+    exts = Gen_Local_ExtPts_Bipartite_MO_jointprob
+    # num_pax = (o-1)*m
     num_pabxy = ((o-1)*m)**2
     # probability distribution of white noise
-    pw = np.concatenate((np.ones(2*num_pax)/o, np.ones(num_pabxy)/o**2)).reshape(1, -1)
+    pw = np.ones(num_pabxy)/o**2
+    # pw = np.concatenate((np.ones(2*num_pax)/o, np.ones(num_pabxy)/o**2)).reshape(1, -1)
     
     if o == 4:
         mat = np.zeros((5,4,4), dtype=complex)
