@@ -7,7 +7,7 @@ Created on Sun Jan 16 15:08:22 2022
 """
 
 import numpy as np
-
+from itertools import combinations
 
 # d = 4, 6 are not applied the function below, since the formula is for prime dimensions.
 def mubs(o):
@@ -33,6 +33,7 @@ def mubs(o):
     for ind_o in range(o+1):
         for ind_povm in range(o):
             _, vec = np.linalg.eig(ZX_o[ind_o])
+            vec = vec.T
             # povm[ind_o, ind_povm] = np.tensordot(vec[ind_povm].reshape(2,1), np.conj(vec[ind_povm].reshape(1,2)), axes=0)
             povm[ind_o, ind_povm] = np.tensordot(vec[ind_povm], np.conj(vec[ind_povm]), axes=0)
     return povm, ZX_o
@@ -125,17 +126,84 @@ def ProbDist_2mo_vAlljoint(m, o, ma, mb, ua, ub):
             for xi in range(m):
                 for yi in range(m):
                     Mab = np.tensordot(Ma[xi, ai], Mb[yi, bi], axes=0)
+                    Mab = np.moveaxis(Mab, 1, 2)
                     rhoM = rho @ Mab
-                    Pabxy[xi, ai, yi, bi] = np.trace(rhoM.reshape(o*m,o*m))
+                    Pabxy[xi, ai, yi, bi] = np.trace(rhoM.reshape(o**2,o**2))
+    return Pabxy
+
+def ProbDist_2mo_Alljoint_vkron(m, o, ma, mb, ua, ub):
+    
+    kets = []
+    # state = np.zeros(o**2, dtype=complex)
+    state = np.zeros((o,o), dtype=complex)
+    for d in range(o):
+        ket = np.zeros(o, dtype=complex)
+        ket[d] = 1
+        kets.append(ket)
+        state += np.tensordot(kets[d], kets[d], axes=0)
+    state = state / np.sqrt(o)
+    rho = np.tensordot(state, state, axes=0)
+    rho = rho.reshape(o**2, o**2)
+    
+    # o-1 for using the constraint sum_a Pax = 1.
+    # Pax (a -> ind_o, x -> ind_m), ind_o-th POVM element and ind_m-th measurement.
+    Ma = np.zeros((m, o, o, o), dtype=complex)
+    Mb = np.zeros((m, o, o, o), dtype=complex)
+    
+    for ind_o in range(o):
+        for ind_m in range(m):
+            Ma[ind_m, ind_o] = ua @ ma[ind_m, ind_o] @ np.conj(ua.T)
+            Mb[ind_m, ind_o] = ub @ mb[ind_m, ind_o] @ np.conj(ub.T)
+        
+    Pabxy = np.zeros((m, o, m, o), dtype=complex)
+    for ai in range(o):
+        for bi in range(o):
+            for xi in range(m):
+                for yi in range(m):
+                    Mab = np.kron(Ma[xi, ai], Mb[yi, bi])
+                    rhoM = rho @ Mab
+                    Pabxy[xi, ai, yi, bi] = np.trace(rhoM)
     return Pabxy
 
 if __name__ == '__main__':
     from scipy.stats import unitary_group
-    for i in range(10):
-        ua = unitary_group.rvs(2)
-        ub = unitary_group.rvs(2)
-        povm, mub2 = mubs(2)
+    from vis_2mo_results import m_from_MUBs
+    num = 10
+    m = 2
+    o = 2
+    mubs_povm, mub2 = mubs(o)
+    m_combine, ab_ind = m_from_MUBs(m, o+1)
+    beta = np.ones((4,4))
+    combin = list(combinations(range(4), 1))
+    for c in range(4):
+        beta[c][combin[c]] = -1
+
+    num_vio = np.zeros(num)
+    for i in range(num):
+        ua = unitary_group.rvs(o)
+        ub = unitary_group.rvs(o)
+        vio_chsh = np.zeros(len(ab_ind))
+        for ind, com in enumerate(ab_ind):
+            ma = mubs_povm[list(m_combine[com[0]])]
+            mb = mubs_povm[list(m_combine[com[1]])]
         # prob = ProbDist_2mo_v1(2,2,povm[:2],povm[:2],ua,ub)
-        prob = ProbDist_2mo_vAlljoint(2,2,povm[:2],povm[:2], ua, ub)
-        print(np.sum(prob.real, axis=1))
-        print(np.sum(prob.real, axis=3))
+            prob = ProbDist_2mo_vAlljoint(m,o, ma, mb, ua, ub)
+            E = np.zeros((m,m))
+            for x in range(m):
+                for y in range(m):
+                    for a in range(o):
+                        for b in range(o):
+                            if a == b:
+                                E[x,y] += prob[x,a,y,b].real
+                            else:
+                                E[x,y] -= prob[x,a,y,b].real
+
+
+            bellval = abs(beta @ E.reshape(4,1))
+            vio_chsh[ind] = max(bellval)
+        num_vio[i] = max(vio_chsh)
+    print(sum(num_vio>2))
+        # print(np.sum(prob.real, axis=1))
+        # print(np.sum(prob.real, axis=3))
+    # print(prob.real)
+        

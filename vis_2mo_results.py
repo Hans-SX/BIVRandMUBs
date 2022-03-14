@@ -31,7 +31,9 @@ def vis_2mo_results(m, o, num_pts, seed):
     # num_pax = (o-1)*m
     num_pabxy = (o*m)**2
     # probability distribution of white noise
-    pw = np.ones(num_pabxy)/o**2
+    # pw = np.ones(num_pabxy)/o**2
+    pw = np.ones(num_pabxy)/o
+    pw = np.reshape(pw, (1,-1))
     # pw = np.concatenate((np.ones(2*num_pax)/o, np.ones(num_pabxy)/o**2)).reshape(1, -1)
     
     if o == 4:
@@ -50,9 +52,9 @@ def vis_2mo_results(m, o, num_pts, seed):
     
     m_combine, ab_ind = m_from_MUBs(m, o+1)
     
-    solver = 0
+    # solver = 0
     # solver = cp.GLPK_MI
-    # solver = 'ECOS_BB'
+    solver = 'ECOS_BB'
     vis = np.zeros(num_pts)
     vis_tmp = np.zeros(len(ab_ind))
     np.random.seed(seed)
@@ -64,8 +66,12 @@ def vis_2mo_results(m, o, num_pts, seed):
             mb = mubs_povm[list(m_combine[com[1]])]
             
             pt = ProbDist_2mo_vAlljoint(m, o, ma, mb, ua, ub)
-            pt = pt.reshape(1,-1)
+            # pt = np.reshape(pt, (-1,))
+            pt = np.reshape(pt, (1,-1))
             # pt = ProbDist_2mo_v1(m, o, ma, mb, ua, ub)
             vis_tmp[ind] = vis_2mo(pt, exts, m, o, pw, solver)
         vis[i] = min(vis_tmp)
     return vis
+vis22 = vis_2mo_results(2,2,100,2)
+print(vis22[vis22>=1])
+print(sum(vis22<1))
