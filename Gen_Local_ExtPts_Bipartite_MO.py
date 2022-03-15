@@ -103,6 +103,8 @@ def Gen_Local_ExtPts_Bipartite_MO_jointprob(m, o):
         tmp_pt = []
     # ------------- Marginal Expts done. -------------
     marg_Exts = np.asarray(marg)
+    Extpts = np.kron(marg_Exts, marg_Exts)
+    '''
     # reshape all Pax -> (num, x, a)
     marg_Exts = marg_Exts.reshape(num_local_strategy, m, o)
     # Pabxy -> Extpts
@@ -112,4 +114,9 @@ def Gen_Local_ExtPts_Bipartite_MO_jointprob(m, o):
     # Split to 2 step to emphasize it is form (x,a,y,b) to a column.
     Extpts = Extpts.reshape(num_ExtPts, -1)
     # N_marg: (num, A/B, x/y, a/b)
+    '''
     return Extpts
+    
+if __name__ == "__main__":
+    exts, exts_kron = Gen_Local_ExtPts_Bipartite_MO_jointprob(3,3)
+    print(exts - exts_kron)

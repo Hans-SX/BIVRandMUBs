@@ -8,6 +8,7 @@ Created on Sun Jan 16 15:08:22 2022
 
 import numpy as np
 from itertools import combinations
+from Gen_Local_ExtPts_Bipartite_MO import Gen_Local_ExtPts_Bipartite_MO_jointprob
 
 # d = 4, 6 are not applied the function below, since the formula is for prime dimensions.
 def mubs(o):
@@ -163,14 +164,53 @@ def ProbDist_2mo_Alljoint_vkron(m, o, ma, mb, ua, ub):
                     Mab = np.kron(Ma[xi, ai], Mb[yi, bi])
                     rhoM = rho @ Mab
                     Pabxy[xi, ai, yi, bi] = np.trace(rhoM)
+                    # Pabxy[ai, yi, bi, xi] = np.trace(rhoM)
+
+    return Pabxy
+
+def ProbDist_2mo_Alljoint_choose_after(m, o, ma, mb, ua, ub):
+    
+    kets = []
+    # state = np.zeros(o**2, dtype=complex)
+    state = np.zeros((o,o), dtype=complex)
+    for d in range(o):
+        ket = np.zeros(o, dtype=complex)
+        ket[d] = 1
+        kets.append(ket)
+        state += np.tensordot(kets[d], kets[d], axes=0)
+    state = state / np.sqrt(o)
+    rho = np.tensordot(state, state, axes=0)
+    rho = rho.reshape(o**2, o**2)
+    
+    # o-1 for using the constraint sum_a Pax = 1.
+    # Pax (a -> ind_o, x -> ind_m), ind_o-th POVM element and ind_m-th measurement.
+    Ma = np.zeros((m, o, o, o), dtype=complex)
+    Mb = np.zeros((m, o, o, o), dtype=complex)
+    
+    for ind_o in range(o):
+        for ind_m in range(m):
+            Ma[ind_m, ind_o] = ua @ ma[ind_m, ind_o] @ np.conj(ua.T)
+            Mb[ind_m, ind_o] = ub @ mb[ind_m, ind_o] @ np.conj(ub.T)
+        
+    Pabxy = np.zeros((m, o, m, o), dtype=complex)
+    for ai in range(o):
+        for bi in range(o):
+            for xi in range(m):
+                for yi in range(m):
+                    Mab = np.kron(Ma[xi, ai], Mb[yi, bi])
+                    rhoM = rho @ Mab
+                    Pabxy[xi, ai, yi, bi] = np.trace(rhoM)
+                    # Pabxy[ai, yi, bi, xi] = np.trace(rhoM)
+
     return Pabxy
 
 if __name__ == '__main__':
     from scipy.stats import unitary_group
     from vis_2mo_results import m_from_MUBs
-    num = 10
+    num = 16
     m = 2
     o = 2
+    exts = Gen_Local_ExtPts_Bipartite_MO_jointprob(m,o)
     mubs_povm, mub2 = mubs(o)
     m_combine, ab_ind = m_from_MUBs(m, o+1)
     beta = np.ones((4,4))
@@ -188,6 +228,7 @@ if __name__ == '__main__':
             mb = mubs_povm[list(m_combine[com[1]])]
         # prob = ProbDist_2mo_v1(2,2,povm[:2],povm[:2],ua,ub)
             prob = ProbDist_2mo_vAlljoint(m,o, ma, mb, ua, ub)
+            # prob = exts[i].reshape(m,o,m,o)
             E = np.zeros((m,m))
             for x in range(m):
                 for y in range(m):

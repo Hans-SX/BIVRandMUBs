@@ -12,7 +12,7 @@ import cvxpy as cp
 
 from Gen_Local_ExtPts_Bipartite_MO import Gen_Local_ExtPts_Bipartite_MO
 from Gen_Local_ExtPts_Bipartite_MO import Gen_Local_ExtPts_Bipartite_MO_jointprob
-from ProbDist_2mo import ProbDist_2mo_v1, ProbDist_2mo_vAlljoint, mubs
+from ProbDist_2mo import ProbDist_2mo_v1, ProbDist_2mo_vAlljoint, mubs, ProbDist_2mo_Alljoint_vkron
 from vis_2mo_linpro import vis_2mo
 from itertools import combinations
 
@@ -65,13 +65,16 @@ def vis_2mo_results(m, o, num_pts, seed):
             ma = mubs_povm[list(m_combine[com[0]])]
             mb = mubs_povm[list(m_combine[com[1]])]
             
-            pt = ProbDist_2mo_vAlljoint(m, o, ma, mb, ua, ub)
+            # pt = ProbDist_2mo_vAlljoint(m, o, ma, mb, ua, ub)
+            pt = ProbDist_2mo_Alljoint_vkron(m, o, ma, mb, ua, ub)
             # pt = np.reshape(pt, (-1,))
             pt = np.reshape(pt, (1,-1))
             # pt = ProbDist_2mo_v1(m, o, ma, mb, ua, ub)
             vis_tmp[ind] = vis_2mo(pt, exts, m, o, pw, solver)
         vis[i] = min(vis_tmp)
     return vis
-vis22 = vis_2mo_results(2,2,100,2)
-print(vis22[vis22>=1])
-print(sum(vis22<1))
+
+if __name__ == "__main__":
+    vis22 = vis_2mo_results(2,2,40,2)
+    print(vis22[vis22>=1])
+    print(sum(vis22<1))
