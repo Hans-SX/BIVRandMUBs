@@ -169,7 +169,7 @@ def ProbDist_2mo_Alljoint_vkron(m, o, ma, mb, ua, ub):
     return Pabxy
 
 def ProbDist_2mo_Alljoint_choose_after(m, o, ma, mb, ua, ub):
-    
+    # no difference
     kets = []
     # state = np.zeros(o**2, dtype=complex)
     state = np.zeros((o,o), dtype=complex)
@@ -218,6 +218,10 @@ if __name__ == '__main__':
     for c in range(4):
         beta[c][combin[c]] = -1
 
+    # ide = np.identity(o)
+    # prob = ProbDist_2mo_vAlljoint(m,o, mubs_povm[:2], mubs_povm[:2], ide, ide)
+    # prob_a = ProbDist_2mo_Alljoint_choose_after(m,o, mubs_povm, mubs_povm, ide, ide)
+    # print(prob[0,0])
     num_vio = np.zeros(num)
     for i in range(num):
         ua = unitary_group.rvs(o)
@@ -228,6 +232,7 @@ if __name__ == '__main__':
             mb = mubs_povm[list(m_combine[com[1]])]
         # prob = ProbDist_2mo_v1(2,2,povm[:2],povm[:2],ua,ub)
             prob = ProbDist_2mo_vAlljoint(m,o, ma, mb, ua, ub)
+            # prob = ProbDist_2mo_Alljoint_choose_after(m,o, ma, mb, ua, ub)
             # prob = exts[i].reshape(m,o,m,o)
             E = np.zeros((m,m))
             for x in range(m):
