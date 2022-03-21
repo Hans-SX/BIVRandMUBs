@@ -10,9 +10,8 @@ from scipy.stats import unitary_group
 from scipy.linalg import hadamard
 import cvxpy as cp
 
-from Gen_Local_ExtPts_Bipartite_MO import Gen_Local_ExtPts_Bipartite_MO
 from Gen_Local_ExtPts_Bipartite_MO import Gen_Local_ExtPts_Bipartite_MO_jointprob
-from ProbDist_2mo import ProbDist_2mo_v1, ProbDist_2mo_vAlljoint, mubs, ProbDist_2mo_Alljoint_vkron
+from ProbDist_2mo import ProbDist_2mo_vAlljoint, mubs, ProbDist_2mo_Alljoint_vkron
 from vis_2mo_linpro import vis_2mo
 from itertools import combinations
 
@@ -76,13 +75,16 @@ def vis_2mo_results(m, k, o, num_pts, seed):
             # pt = ProbDist_2mo_v1(m, o, ma, mb, ua, ub)
             vis_tmp[ind] = vis_2mo(pt, exts, m, o, pw, solver)
         vis[i] = min(vis_tmp)
+    print(sum(vis<1)/100)
+    print(max(vis), min(vis), np.mean(vis))
+    print('k = ', k, ' d = ', o, 'num_pts', num_pts)
     return vis
 
-if __name__ == "__main__":
-    k = 3; d = 4
-    vis = vis_2mo_results(2,k,d,100,2)
-    print(vis[vis>=1])
-    print(sum(vis<1))
-    print(max(vis), min(vis), np.mean(vis))
-    print('k = ', k, ' d = ', d)    
-    # print(vis222)
+# if __name__ == "__main__":
+#     k = 3; d = 4
+#     vis = vis_2mo_results(2,k,d,100,2)
+#     print(vis[vis>=1])
+#     print(sum(vis<1))
+#     print(max(vis), min(vis), np.mean(vis))
+#     print('k = ', k, ' d = ', d)    
+#     # print(vis222)
