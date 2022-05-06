@@ -5,10 +5,12 @@ Created on Tue Feb 22 17:05:28 2022
 
 @author: sxyang
 """
+# %%
 import numpy as np
 from scipy.stats import unitary_group
 from scipy.linalg import hadamard
-import cvxpy as cp
+# import cvxpy as cp
+import matplotlib.pyplot as plt
 
 from Gen_Local_ExtPts_Bipartite_MO import Gen_Local_ExtPts_Bipartite_MO_jointprob
 from ProbDist_2mo import ProbDist_2mo_vAlljoint, mubs, ProbDist_2mo_Alljoint_vkron
@@ -75,16 +77,25 @@ def vis_2mo_results(m, k, o, num_pts, seed):
             # pt = ProbDist_2mo_v1(m, o, ma, mb, ua, ub)
             vis_tmp[ind] = vis_2mo(pt, exts, m, o, pw, solver)
         vis[i] = min(vis_tmp)
-    print(sum(vis<1)/100)
+    print(sum(vis<1)/num_pts * 100)
+    print(vis[np.matrix.round(vis, 5)==0])
     print(max(vis), min(vis), np.mean(vis))
     print('k = ', k, ' d = ', o, 'num_pts', num_pts)
+    n, bins, patches = plt.hist(vis,40)
+
+    plt.xlabel('visibility')
+    plt.ylabel('Relative frequency')
+    plt.title('Vis_'+str(k)+str(o))
+    plt.show()
     return vis
 
-# if __name__ == "__main__":
-#     k = 3; d = 4
-#     vis = vis_2mo_results(2,k,d,100,2)
+if __name__ == "__main__":
+    # %%
+    k = 4; d = 3
+    vis = vis_2mo_results(2,k,d,1000,2)
 #     print(vis[vis>=1])
 #     print(sum(vis<1))
 #     print(max(vis), min(vis), np.mean(vis))
 #     print('k = ', k, ' d = ', d)    
 #     # print(vis222)
+# %%
